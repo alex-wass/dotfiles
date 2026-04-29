@@ -138,6 +138,7 @@ resolve_dotfiles_dir
 ########################################
 step_cli() {
     step "Install macOS Command Line Tools"
+
     if command -v xcode-select >/dev/null 2>&1 && xcode-select -p >/dev/null 2>&1; then
         if [[ $FORCE -eq 0 ]]; then
             success "Command Line Tools already installed; skipping"
@@ -176,7 +177,9 @@ step_cli() {
 ########################################
 step_touchid() {
     step "Enable Touch ID for sudo"
+
     local pamfile=/etc/pam.d/sudo
+
     if grep -q pam_tid.so "$pamfile" 2>/dev/null; then
         if [[ $FORCE -eq 0 ]]; then
             success "Touch ID already enabled for sudo; skipping"
@@ -188,6 +191,7 @@ step_touchid() {
     run_cmd "echo 'auth       sufficient     pam_tid.so' > /tmp/sudo.tmp"
     run_cmd "sed -e '/pam_tid.so/d' $pamfile >> /tmp/sudo.tmp"
     run_sudo_cmd "mv /tmp/sudo.tmp $pamfile"
+
     success "Touch ID configured"
 }
 
