@@ -15,6 +15,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/alex-wass/dotfiles/HEAD/inst
 | `ssh`     | Generate SSH key and print/copy public key                   |
 | `git`     | Setup global git configurations                              |
 | `brew`    | Install Homebrew and packages                                |
+| `shell`   | Copy shell config files                                      |
 
 ### Flags
 

@@ -20,7 +20,7 @@ FORCE=0
 DOTFILES_DIR=""
 _DOTFILES_TMPDIR=""
 declare -a SELECTED_STEPS=()
-ALL_STEPS=(cli touchid ssh git brew)
+ALL_STEPS=(cli touchid ssh git brew shell)
 
 usage() {
     cat <<EOF
@@ -32,6 +32,7 @@ Steps available:
     ssh       Generate SSH key and print/copy public key
     git       Setup global git configurations
     brew      Install Homebrew and packages
+    shell     Copy shell config files
     all       Run all steps (default)
 
 Flags:
@@ -274,9 +275,44 @@ step_brew() {
     success "Homebrew and packages installed"
 }
 
+########################################
 # Shell
+########################################
+step_shell() {
+    step "Configuring shell"
 
-# tmux
+    # Remove "Last login" message in new terminal windows and new tabs
+    touch ~/.hushlogin
+
+    local files=(.zshenv .zshrc .p10k.zsh .tmux.conf)
+
+    for f in "${files[@]}"; do
+        if [[ -f "$HOME/$f" && $FORCE -eq 0 ]]; then
+            success "$f already exists; skipping"
+        else
+            run_cmd "cp \"$DOTFILES_DIR/home/$f\" \"$HOME/$f\""
+            success "$f copied"
+        fi
+    done
+
+    while IFS= read -r -d '' f; do
+        local rel="${f#$DOTFILES_DIR/home/.config/}"
+        local dest="$HOME/.config/$rel"
+
+        if [[ -e "$dest" && $FORCE -eq 0 ]]; then
+            success ".config/$rel already exists; skipping"
+        else
+            run_cmd "mkdir -p \"$(dirname "$dest")\""
+            run_cmd "cp -R \"$f\" \"$dest\""
+            success ".config/$rel copied"
+        fi
+    done < <(find "$DOTFILES_DIR/home/.config" -type f -print0)
+
+    run_cmd "/opt/homebrew/bin/tmux source-file \"$HOME/.tmux.conf\" >/dev/null 2>&1 || true"
+
+    success "Shell configured"
+    warn "Restart your terminal or run: exec zsh"
+}
 
 # Node
 
@@ -304,9 +340,6 @@ run_step_if_selected() {
 if [[ ${#SELECTED_STEPS[@]} -eq 0 ]]; then
     SELECTED_STEPS=(all)
 fi
-
-# Remove "Last login" message in new terminal windows and new tabs
-touch ~/.hushlogin
 
 for s in "${ALL_STEPS[@]}"; do
     run_step_if_selected "$s"
