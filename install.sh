@@ -17,6 +17,8 @@ error() { echo -e "${RED}✗${NC} $1"; exit 1; }
 
 DRY_RUN=0
 FORCE=0
+DOTFILES_DIR=""
+_DOTFILES_TMPDIR=""
 declare -a SELECTED_STEPS=()
 ALL_STEPS=(cli touchid)
 
@@ -48,6 +50,34 @@ run_sudo_cmd() {
         sudo bash -c "$*"
     else
         echo "$ sudo $*"
+    fi
+}
+
+resolve_dotfiles_dir() {
+    local script_dir
+    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd)" || true
+
+    if [[ -d "$script_dir/home" ]]; then
+        DOTFILES_DIR="$script_dir"
+        return
+    fi
+
+    step "Downloading dotfiles archive"
+
+    _DOTFILES_TMPDIR=$(mktemp -d)
+    trap cleanup_dotfiles EXIT
+
+    run_cmd "curl -fsSL https://github.com/alex-wass/dotfiles/archive/refs/heads/master.zip -o $_DOTFILES_TMPDIR/repo.zip || error 'Failed to download dotfiles'"
+    run_cmd "unzip -q $_DOTFILES_TMPDIR/repo.zip -d $_DOTFILES_TMPDIR || error 'Failed to extract dotfiles'"
+
+    DOTFILES_DIR="$_DOTFILES_TMPDIR/dotfiles-master"
+
+    success "Download complete"
+}
+
+cleanup_dotfiles() {
+    if [[ -n "$_DOTFILES_TMPDIR" && -d "$_DOTFILES_TMPDIR" ]]; then
+        rm -rf "$_DOTFILES_TMPDIR"
     fi
 }
 
@@ -100,6 +130,8 @@ fi
 
 echo ""
 sudo -v
+
+resolve_dotfiles_dir
 
 ########################################
 # CLI tools
