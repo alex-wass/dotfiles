@@ -8,11 +8,12 @@ bash <(curl -fsSL https://raw.githubusercontent.com/alex-wass/dotfiles/HEAD/inst
 
 ### Steps
 
-| Step     | Description                                                  |
-| -------- | ------------------------------------------------------------ |
-| `cli`    | Install macOS Command Line Tools and accept Xcode license    |
-| `git`    | Setup global git configurations.                             |
-| `touchid`| Enable Touch ID for sudo                                     |
+| Step      | Description                                                  |
+| --------- | ------------------------------------------------------------ |
+| `cli`     | Install macOS Command Line Tools and accept Xcode license    |
+| `touchid` | Add Touch ID support for sudo                                |
+| `ssh`     | Generate SSH key and print/copy public key                   |
+| `git`     | Setup global git configurations                              |
 
 ### Flags
 

@@ -20,16 +20,17 @@ FORCE=0
 DOTFILES_DIR=""
 _DOTFILES_TMPDIR=""
 declare -a SELECTED_STEPS=()
-ALL_STEPS=(cli git touchid)
+ALL_STEPS=(cli touchid ssh git)
 
 usage() {
     cat <<EOF
-Usage: $(basename "$0") [--dry-run|-n] [--force|-f] [--steps=cli,touchid] [step1 step2 ...]
+Usage: $(basename "$0") [--dry-run|-n] [--force|-f] [--steps=cli,git] [step1 step2 ...]
 
 Steps available:
     cli       Install macOS Command Line Tools and accept Xcode license
-    git       Copy .gitconfig from home/ to ~/.gitconfig
-    touchid   Add Touch ID (fingerprint) support to sudo (/etc/pam.d/sudo)
+    touchid   Add Touch ID support for sudo
+    ssh       Generate SSH key and print/copy public key
+    git       Setup global git configurations
     all       Run all steps (default)
 
 Flags:
@@ -194,6 +195,43 @@ step_touchid() {
     run_sudo_cmd "mv /tmp/sudo.tmp $pamfile"
 
     success "Touch ID configured"
+}
+
+########################################
+# Setup a new SSH key
+########################################
+step_ssh() {
+    step "Setting up SSH"
+
+    local key="$HOME/.ssh/id_ed25519"
+    local config="$HOME/.ssh/config"
+    local comment
+    comment="$(printf 'alex+%02d%02d@wass.sh' $(date +%m) $(date +%y))"
+
+    if [[ -f "$key" && $FORCE -eq 0 ]]; then
+        success "SSH key already exists; skipping"
+    else
+        run_cmd "rm -f \"$key\" \"${key}.pub\""
+        run_cmd "ssh-keygen -t ed25519 -N \"\" -C \"$comment\" -f \"$key\" >/dev/null 2>&1"
+
+        if [[ -f "${key}.pub" ]]; then
+            if command -v pbcopy >/dev/null 2>&1; then
+                run_cmd "pbcopy < \"${key}.pub\""
+                success "Public key copied to clipboard"
+            else
+                cat "${key}.pub"
+            fi
+        fi
+
+        success "SSH key generated"
+    fi
+
+    if [[ -f "$config" && $FORCE -eq 0 ]]; then
+        success "SSH config already exists; skipping"
+    else
+        run_cmd "cp \"$DOTFILES_DIR/home/.ssh/config\" \"$config\""
+        success "SSH config copied"
+    fi
 }
 
 ########################################
