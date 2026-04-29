@@ -1,0 +1,44 @@
+[user]
+	email = alex@wass.sh
+	name = Alex Wass
+[core]
+	editor = nano
+	fileMode = false
+[alias]
+	cp = cherry-pick
+	a = commit --amend
+	fix = commit --amend --no-edit
+	steal = commit --amend --reset-author --no-edit
+	co = checkout
+	clean-branches = "!git fetch -p && git branch -vv | awk '/: gone]/{print $1}' | xargs git branch -D"
+
+	# Single line log
+	l = log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short
+
+	# https://gist.github.com/robmiller/6018582
+	# Get the current branch name (not so useful in itself, but used in other aliases)
+	branch-name = "!git rev-parse --abbrev-ref HEAD"
+
+	# Push the current branch to the remote "origin", and set it to track the upstream branch
+	publish = "!git push -u origin $(git branch-name)"
+
+	# Delete the remote version of the current branch
+	unpublish = "!git push origin :$(git branch-name)"
+
+	# Delete a branch and recreate it from master — useful if you have, say, a development branch and a master branch and they could conceivably go out of sync
+	recreate = "!f() { [[ -n $@ ]] && git checkout \"$@\" && git unpublish && git checkout master && git branch -D \"$@\" && git checkout -b \"$@\" && git publish; }; f"
+
+	# Create a new branch from master
+	new = "!f() { [[ -n $@ ]] && git co master && git pull origin master && git co -b \"$@\" && git publish && git co \"$@\"; }; f"
+
+	# Create a temp wip commit
+	wip = "!git add . && git commit -m \"wip\" --no-verify"
+
+[checkout]
+	defaultRemote = origin
+[init]
+	defaultBranch = master
+[pull]
+	rebase = true
+[rerere]
+	enabled = true

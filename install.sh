@@ -20,7 +20,7 @@ FORCE=0
 DOTFILES_DIR=""
 _DOTFILES_TMPDIR=""
 declare -a SELECTED_STEPS=()
-ALL_STEPS=(cli touchid)
+ALL_STEPS=(cli git touchid)
 
 usage() {
     cat <<EOF
@@ -28,6 +28,7 @@ Usage: $(basename "$0") [--dry-run|-n] [--force|-f] [--steps=cli,touchid] [step1
 
 Steps available:
     cli       Install macOS Command Line Tools and accept Xcode license
+    git       Copy .gitconfig from home/ to ~/.gitconfig
     touchid   Add Touch ID (fingerprint) support to sudo (/etc/pam.d/sudo)
     all       Run all steps (default)
 
@@ -195,7 +196,24 @@ step_touchid() {
     success "Touch ID configured"
 }
 
+########################################
 # Git
+########################################
+step_git() {
+    step "Configuring Git"
+
+    local src="$DOTFILES_DIR/home/.gitconfig"
+    local dest="$HOME/.gitconfig"
+
+    if [[ -f "$dest" && $FORCE -eq 0 ]]; then
+        success "Git already configured; skipping"
+        return 0
+    fi
+
+    run_cmd "cp \"$src\" \"$dest\""
+
+    success "Git configured"
+}
 
 # Shell
 
