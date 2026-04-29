@@ -20,7 +20,7 @@ FORCE=0
 DOTFILES_DIR=""
 _DOTFILES_TMPDIR=""
 declare -a SELECTED_STEPS=()
-ALL_STEPS=(cli touchid ssh git)
+ALL_STEPS=(cli touchid ssh git brew)
 
 usage() {
     cat <<EOF
@@ -31,6 +31,7 @@ Steps available:
     touchid   Add Touch ID support for sudo
     ssh       Generate SSH key and print/copy public key
     git       Setup global git configurations
+    brew      Install Homebrew and packages
     all       Run all steps (default)
 
 Flags:
@@ -253,11 +254,29 @@ step_git() {
     success "Git configured"
 }
 
+########################################
+# Homebrew
+########################################
+step_brew() {
+    step "Installing Homebrew"
+
+    if command -v /opt/homebrew/bin/brew >/dev/null 2>&1; then
+        if [[ $FORCE -eq 0 ]]; then
+            success "Homebrew already installed; skipping"
+            return 0
+        fi
+    fi
+
+    run_cmd 'NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" >/dev/null 2>&1'
+
+    run_cmd "/opt/homebrew/bin/brew bundle check --file \"$DOTFILES_DIR/Brewfile\" >/dev/null 2>&1 || /opt/homebrew/bin/brew bundle install --file \"$DOTFILES_DIR/Brewfile\" >/dev/null 2>&1"
+
+    success "Homebrew and packages installed"
+}
+
 # Shell
 
 # tmux
-
-# Homebrew
 
 # Node
 
@@ -272,7 +291,6 @@ step_git() {
 ########################################
 # Plan and run selected steps
 ########################################
-
 run_step_if_selected() {
     local name=$1; shift
     if has_selected "$name"; then
