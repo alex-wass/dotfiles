@@ -95,48 +95,159 @@ compdef _directories md
 # Define named directories: ~w <=> Windows home directory on WSL.
 [[ -z $z4h_win_home ]] || hash -d w=$z4h_win_home
 
-# Define aliases.
-alias tree='tree -a -I .git'
 
-# Add flags to existing aliases.
-alias ls="${aliases[ls]:-ls} -A"
+# =============================================================================
+# Exports
+# =============================================================================
 
-# Set shell options: http://zsh.sourceforge.net/Doc/Release/Options.html.
-setopt glob_dots     # no special treatment for file names with a leading dot
-setopt no_auto_menu  # require an extra TAB press to open the completion menu
-setopt share_history
-
-# Paths
-export PATH=$HOME/bin:$HOME/.config/composer/vendor/bin:/opt/homebrew/opt/mysql-client/bin:/opt/metasploit-framework/bin:/usr/local/bin:/opt/homebrew/opt/texinfo/bin:/opt/homebrew/Cellar/bash/5.2.15/bin/bash:$PATH
-
+# Java
 export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home
+
+# Android SDK
 export ANDROID_HOME=$HOME/Library/Android/sdk
+
+# Don't clear the screen after quitting a manual page
+export MANPAGER="less -X"
+
+# Don't auto-update Homebrew on every command
+export HOMEBREW_NO_AUTO_UPDATE=1
+
+# Larger history (32³ entries; default is 500)
+export HISTSIZE=32768
+export HISTFILESIZE=$HISTSIZE
+export HISTCONTROL=ignoredups
+
+# ZSH equivalent of HISTIGNORE
+export HISTORY_IGNORE="(ls|cd|cd -|pwd|exit|date|* --help)"
+
+
+# =============================================================================
+# PATH
+# =============================================================================
+
+export PATH=$HOME/bin:$PATH
+
+# Composer vendor binaries
+export PATH=$HOME/.config/composer/vendor/bin:$PATH
+
+# Homebrew MySQL client
+export PATH=/opt/homebrew/opt/mysql-client/bin:$PATH
+
+# Metasploit Framework
+export PATH=/opt/metasploit-framework/bin:$PATH
+export PATH=/usr/local/bin:$PATH
+
+# Homebrew texinfo
+export PATH=/opt/homebrew/opt/texinfo/bin:$PATH
+
+# Homebrew bash
+export PATH=/opt/homebrew/Cellar/bash/5.2.15/bin/bash:$PATH
+
+# Rust / Cargo
+export PATH=$PATH:$HOME/.cargo/bin
+
+# Custom scripts
+export PATH=$PATH:$HOME/.local/scripts
+
+# Android emulator and platform tools
 export PATH=$PATH:$ANDROID_HOME/emulator
 export PATH=$PATH:$ANDROID_HOME/platform-tools
-export PATH=$PATH:$HOME/.cargo/bin
-export PATH=$PATH:$HOME/.local/scripts
+
+# opencode CLI
+export PATH=/Users/alex/.opencode/bin:$PATH
+
+
+# =============================================================================
+# Shell Options
+# =============================================================================
+
+# No special treatment for file names with a leading dot
+setopt glob_dots
+
+# Require an extra TAB press to open the completion menu
+setopt no_auto_menu
+
+# Share history between terminal sessions
+setopt share_history
+
+
+# =============================================================================
+# Aliases
+# =============================================================================
+
+# Show hidden files in directory listings
+alias ls="${aliases[ls]:-ls} -A"
+
+# List all files colorized in long format
+alias ll="ls -laF"
+
+# Show hidden files but skip .git directories
+alias tree='tree -a -I .git'
+
+# Replace cat with bat if available
+if command -v bat &> /dev/null; then
+    alias cat="bat --style=plain"
+fi
+
+# Replace grep with ripgrep if available
+if command -v rg &> /dev/null; then
+    alias grep="rg"
+fi
+
+# Nuke all uncommitted changes
+alias nah='git reset --hard;git clean -df'
 
 # Laravel
 alias sail='bash vendor/bin/sail'
 alias pint='php vendor/bin/pint'
 alias stan='php ./vendor/bin/phpstan analyse --memory-limit=2G'
 alias sa='sail artisan'
+alias mfs='sail artisan migrate:fresh --seed'
 
-# fnm - Node.js version manager
+# Show/hide hidden files in Finder
+alias show="defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder"
+alias hide="defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder"
+
+# Get public IP
+alias ip="curl ifconfig.me/ip ; echo"
+
+# Flush DNS cache
+alias flushdns="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
+
+# Launch a debug Chrome for agents
+alias chrome-dev="/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome --remote-debugging-port=9222 --user-data-dir=/tmp/chrome-profile-stable"
+
+# Open current directory in VS Code
+alias vs='code "`pwd`"'
+
+# Copy SSH public key to clipboard
+alias copykey='command cat ~/.ssh/id_ed25519.pub 2>/dev/null || command cat ~/.ssh/id_rsa.pub 2>/dev/null | pbcopy'
+
+
+# =============================================================================
+# Tool Setup
+# =============================================================================
+
+# fnm — Node.js version manager
 if command -v fnm &> /dev/null; then
     eval "$(fnm env --use-on-cd --shell zsh)"
     alias nvm='fnm'
 fi
 
-# Composer version check
+
+# =============================================================================
+# Functions
+# =============================================================================
+
+# Show latest available version for a Composer package
 csl() { composer2 show -l "$1" }
 
-# PHP Switch
+# Switch between Homebrew PHP versions (e.g. switch-php 8.2)
 switch-php() { brew unlink php && brew link php@"$1" }
 
+
+# =============================================================================
+# Startup
+# =============================================================================
+
 neofetch
-
-alias chrome-dev="/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome --remote-debugging-port=9222 --user-data-dir=/tmp/chrome-profile-stable"
-
-# opencode
-export PATH=/Users/alex/.opencode/bin:$PATH
