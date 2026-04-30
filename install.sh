@@ -33,7 +33,7 @@ Steps available:
     git       Setup global git configurations
     brew      Install Homebrew and packages
     shell     Copy shell config files
-    composer  Install Composer
+    composer  Install Composer and global packages
     all       Run all steps (default)
 
 Flags:
@@ -334,11 +334,14 @@ step_composer() {
     run_cmd "echo '$expected_sha  /tmp/composer-setup.php' | shasum -a 384 -c - >/dev/null 2>&1"
     run_sudo_cmd "php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer >/dev/null 2>&1"
     run_cmd "rm -f /tmp/composer-setup.php"
+    run_sudo_cmd "chown -R \"$(whoami)\" $HOME/.composer"
 
     success "Composer installed"
-}
 
-# Cloudflared
+    run_cmd "composer global require laravel/installer >/dev/null 2>&1"
+
+    success "Global packages installed"
+}
 
 ########################################
 # Plan and run selected steps
