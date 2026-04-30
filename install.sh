@@ -20,7 +20,7 @@ FORCE=0
 DOTFILES_DIR=""
 _DOTFILES_TMPDIR=""
 declare -a SELECTED_STEPS=()
-ALL_STEPS=(cli touchid ssh git brew shell)
+ALL_STEPS=(cli touchid ssh git brew shell composer)
 
 usage() {
     cat <<EOF
@@ -33,6 +33,7 @@ Steps available:
     git       Setup global git configurations
     brew      Install Homebrew and packages
     shell     Copy shell config files
+    composer  Install Composer
     all       Run all steps (default)
 
 Flags:
@@ -314,13 +315,28 @@ step_shell() {
     warn "Restart your terminal or run: exec zsh"
 }
 
-# Node
-
+########################################
 # Composer
-## Laravel Installer
-## Github key
+########################################
+step_composer() {
+    step "Installing Composer"
 
-# Configs
+    if command -v /usr/local/bin/composer >/dev/null 2>&1; then
+        if [[ $FORCE -eq 0 ]]; then
+            success "Composer already installed; skipping"
+            return 0
+        fi
+    fi
+
+    local expected_sha
+    expected_sha="$(curl -fsSL https://composer.github.io/installer.sig)"
+    run_cmd "curl -fsSL https://getcomposer.org/installer -o /tmp/composer-setup.php"
+    run_cmd "echo '$expected_sha  /tmp/composer-setup.php' | shasum -a 384 -c - >/dev/null 2>&1"
+    run_sudo_cmd "php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer >/dev/null 2>&1"
+    run_cmd "rm -f /tmp/composer-setup.php"
+
+    success "Composer installed"
+}
 
 # Cloudflared
 
