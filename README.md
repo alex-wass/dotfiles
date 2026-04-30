@@ -16,7 +16,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/alex-wass/dotfiles/HEAD/inst
 | `git`     | Setup global git configurations                              |
 | `brew`    | Install Homebrew and packages                                |
 | `shell`   | Copy shell config files                                      |
-| `composer`| Install Composer and global packages                         |
+| `composer`| Install global composer packages                             |
 
 ### Flags
 

@@ -107,7 +107,7 @@ setopt no_auto_menu  # require an extra TAB press to open the completion menu
 setopt share_history
 
 # Paths
-export PATH=$HOME/bin:$HOME/.composer/vendor/bin:/opt/homebrew/opt/mysql-client/bin:/opt/metasploit-framework/bin:/usr/local/bin:/opt/homebrew/opt/texinfo/bin:/opt/homebrew/Cellar/bash/5.2.15/bin/bash:$PATH
+export PATH=$HOME/bin:$HOME/.config/composer/vendor/bin:/opt/homebrew/opt/mysql-client/bin:/opt/metasploit-framework/bin:/usr/local/bin:/opt/homebrew/opt/texinfo/bin:/opt/homebrew/Cellar/bash/5.2.15/bin/bash:$PATH
 
 export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home
 export ANDROID_HOME=$HOME/Library/Android/sdk
