@@ -193,8 +193,14 @@ step_touchid() {
     step "Enable Touch ID for sudo"
 
     local pamfile=/etc/pam.d/sudo
+    local reattach_lib
+    reattach_lib="${HOMEBREW_PREFIX:-/opt/homebrew}/lib/pam/pam_reattach.so"
 
-    if grep -q pam_tid.so "$pamfile" 2>/dev/null; then
+    if [[ ! -f "$reattach_lib" ]] && ! has_selected "brew"; then
+        warn "pam-reattach not found. Re-run with the 'brew' step to enable tmux support"
+    fi
+
+    if grep -q pam_reattach.so "$pamfile" 2>/dev/null; then
         if [[ $FORCE -eq 0 ]]; then
             success "Touch ID already enabled for sudo; skipping"
             return 0
@@ -202,8 +208,9 @@ step_touchid() {
     fi
 
     run_sudo_cmd "cp -a $pamfile ${pamfile}.bak.$(date +%s)"
-    run_cmd "echo 'auth       sufficient     pam_tid.so' > /tmp/sudo.tmp"
-    run_cmd "sed -e '/pam_tid.so/d' $pamfile >> /tmp/sudo.tmp"
+    run_cmd "echo 'auth       optional       $reattach_lib' > /tmp/sudo.tmp"
+    run_cmd "echo 'auth       sufficient     pam_tid.so' >> /tmp/sudo.tmp"
+    run_cmd "sed -e '/pam_reattach.so/d' -e '/pam_tid.so/d' $pamfile >> /tmp/sudo.tmp"
     run_sudo_cmd "mv /tmp/sudo.tmp $pamfile"
 
     success "Touch ID configured"
