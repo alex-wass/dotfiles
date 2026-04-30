@@ -151,11 +151,10 @@ step_cli() {
         fi
     fi
 
-    run_cmd "xcode-select --install || true"
+    run_cmd "xcode-select --install >/dev/null 2>&1 || true"
 
     if [[ $DRY_RUN -eq 0 ]]; then
         # Wait for install to complete
-        echo "Waiting for Command Line Tools to install..."
         local max_wait=600
         local waited=0
         while [[ $waited -lt $max_wait ]]; do
@@ -172,7 +171,17 @@ step_cli() {
     fi
 
     # Accept license if necessary
-    run_sudo_cmd "xcodebuild -license accept || true"
+    run_sudo_cmd "xcodebuild -license accept >/dev/null 2>&1 || true"
+
+    # Install Rosetta 2 on Apple Silicon
+    if [[ "$(uname -m)" == "arm64" ]]; then
+        if pkgutil --pkg-info com.apple.pkg.RosettaUpdateAuto >/dev/null 2>&1 && [[ $FORCE -eq 0 ]]; then
+            success "Rosetta 2 already installed; skipping"
+        else
+            run_sudo_cmd "softwareupdate --install-rosetta --agree-to-license >/dev/null 2>&1"
+            success "Rosetta 2 installed"
+        fi
+    fi
 
     success "macOS Command Line Tools installed"
 }
