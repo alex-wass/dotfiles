@@ -122,10 +122,11 @@ alias pint='php vendor/bin/pint'
 alias stan='php ./vendor/bin/phpstan analyse --memory-limit=2G'
 alias sa='sail artisan'
 
-# NVM
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# fnm - Node.js version manager
+if command -v fnm &> /dev/null; then
+    eval "$(fnm env --use-on-cd --shell zsh)"
+    alias nvm='fnm'
+fi
 
 # Composer version check
 csl() { composer2 show -l "$1" }
