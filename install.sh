@@ -342,8 +342,6 @@ run_step_if_selected() {
     local name=$1; shift
     if has_selected "$name"; then
         "step_${name}" "$@"
-    else
-        step "Skipped: $name"
     fi
 }
 
@@ -358,4 +356,3 @@ done
 
 echo ""
 success "Installation complete!"
-echo ""
