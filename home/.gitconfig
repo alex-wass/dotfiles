@@ -1,6 +1,7 @@
 [user]
 	email = alex@wass.sh
 	name = Alex Wass
+	signingkey = 791F4DD7508CB342
 [core]
 	editor = nano
 	fileMode = false
@@ -44,3 +45,7 @@
 	enabled = true
 [push]
 	autoSetupRemote = true
+[commit]
+	gpgsign = true
+[tag]
+	gpgSign = true
