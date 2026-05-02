@@ -17,6 +17,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/alex-wass/dotfiles/HEAD/inst
 | `brew`    | Install Homebrew and packages                                |
 | `shell`   | Copy shell config files                                      |
 | `composer`| Install global composer packages                             |
+| `macos`   | Apply macOS system defaults (Dock, Finder, Keyboard, etc.)   |
 
 ### Flags
 

@@ -20,7 +20,7 @@ FORCE=0
 DOTFILES_DIR=""
 _DOTFILES_TMPDIR=""
 declare -a SELECTED_STEPS=()
-ALL_STEPS=(cli touchid ssh git brew shell composer)
+ALL_STEPS=(cli touchid ssh git brew shell macos composer)
 
 usage() {
     cat <<EOF
@@ -34,6 +34,7 @@ Steps available:
     brew      Install Homebrew and packages
     shell     Copy shell config files
     composer  Install global composer packages
+    macos     Apply macOS system defaults (Dock, Finder, Keyboard, etc.)
     all       Run all steps (default)
 
 Flags:
@@ -340,6 +341,165 @@ step_composer() {
     run_cmd "composer global require laravel/installer >/dev/null 2>&1"
 
     success "Global packages installed"
+}
+
+########################################
+# macOS defaults
+########################################
+step_macos() {
+    step "Applying macOS defaults"
+
+    ########################################
+    # Keyboard
+    ########################################
+
+    # Fast key repeat: 15ms delay before repeat starts
+    run_cmd "defaults write NSGlobalDomain InitialKeyRepeat -int 15"
+    # Fast key repeat: 5ms between repeats
+    run_cmd "defaults write NSGlobalDomain KeyRepeat -int 5"
+    # Fn keys act as standard F1-F12 (not media/brightness keys)
+    run_cmd "defaults write NSGlobalDomain com.apple.keyboard.fnState -int 1"
+    # Disable swipe back/forward navigation with two-finger scroll
+    run_cmd "defaults write NSGlobalDomain AppleEnableSwipeNavigateWithScrolls -int 0"
+    # Hide menu bar when in fullscreen
+    run_cmd "defaults write NSGlobalDomain AppleMenuBarVisibleInFullscreen -int 0"
+    # Don't auto-switch Spaces when switching to an app in another Space
+    run_cmd "defaults write NSGlobalDomain AppleSpacesSwitchOnActivate -int 0"
+    # Medium sidebar/table view icon size
+    run_cmd "defaults write NSGlobalDomain NSTableViewDefaultSizeMode -int 2"
+    # Disable auto-capitalization
+    run_cmd "defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -int 0"
+    # Disable double-space for full stop
+    run_cmd "defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -int 0"
+    # Disable smart quotes
+    run_cmd "defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -int 0"
+    # Disable smart dashes
+    run_cmd "defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -int 0"
+    # Disable auto-correct / spell correction
+    run_cmd "defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -int 0"
+
+    ########################################
+    # Mouse & Trackpad
+    ########################################
+
+    # Mouse tracking speed
+    run_cmd "defaults write NSGlobalDomain com.apple.mouse.scaling -float 0.875"
+    # Disable Notification Center swipe from right edge of trackpad
+    run_cmd "defaults write com.apple.AppleMultitouchTrackpad TrackpadTwoFingerFromRightEdgeGesture -int 0"
+
+    ########################################
+    # Dock & Mission Control
+    ########################################
+
+    # Auto-hide the Dock
+    run_cmd "defaults write com.apple.dock autohide -int 1"
+    # Dock icon size in pixels
+    run_cmd "defaults write com.apple.dock tilesize -int 44"
+    # Don't show recently used apps in Dock
+    run_cmd "defaults write com.apple.dock \"show-recents\" -int 0"
+    # Don't auto-rearrange Spaces based on most recent use
+    run_cmd "defaults write com.apple.dock \"mru-spaces\" -int 0"
+    # Hot corner bottom-right: no action
+    run_cmd "defaults write com.apple.dock \"wvous-br-corner\" -int 1"
+    run_cmd "defaults write com.apple.dock \"wvous-br-modifier\" -int 0"
+    # Remove all pinned apps from the Dock
+    run_cmd "defaults write com.apple.dock persistent-apps -array"
+    run_cmd "defaults write com.apple.dock persistent-others -array"
+
+    ########################################
+    # Desktop & Window Manager
+    ########################################
+
+    # Hide widgets on desktop
+    run_cmd "defaults write com.apple.WindowManager StandardHideWidgets -int 1"
+    # Click wallpaper does not reveal desktop
+    run_cmd "defaults write com.apple.WindowManager EnableStandardClickToShowDesktop -int 0"
+    # Show margins between tiled windows
+    run_cmd "defaults write com.apple.WindowManager EnableTiledWindowMargins -int 1"
+
+    ########################################
+    # Finder
+    ########################################
+
+    # Show all file extensions
+    run_cmd "defaults write NSGlobalDomain AppleShowAllExtensions -int 1"
+    # Scroll bar click: jump to selected spot
+    run_cmd "defaults write NSGlobalDomain AppleScrollerPagingBehavior -int 1"
+    # Default search scope: search the current folder
+    run_cmd "defaults write com.apple.finder FXDefaultSearchScope -string SCcf"
+    # Auto-remove items from Trash after 30 days
+    run_cmd "defaults write com.apple.finder FXRemoveOldTrashItems -int 1"
+    # Disable warning when changing a file extension
+    run_cmd "defaults write com.apple.finder FXEnableExtensionChangeWarning -int 0"
+    # Don't show external hard drives on desktop
+    run_cmd "defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -int 0"
+    # Don't show removable media (USB drives) on desktop
+    run_cmd "defaults write com.apple.finder ShowRemovableMediaOnDesktop -int 0"
+    # Don't show recent tags in sidebar
+    run_cmd "defaults write com.apple.finder ShowRecentTags -int 0"
+    # New Finder windows open to Home folder (not Recents)
+    run_cmd "defaults write com.apple.finder NewWindowTarget -string PfHm"
+    # Default Finder view style: column view
+    run_cmd "defaults write com.apple.finder FXPreferredViewStyle -string clmv"
+    # Allow text selection in Quick Look previews
+    run_cmd "defaults write com.apple.finder QLEnableTextSelection -bool true"
+
+    ########################################
+    # Sound
+    ########################################
+
+    # Disable user interface sound effects
+    run_cmd "defaults write NSGlobalDomain com.apple.sound.uiaudio.enabled -int 0"
+
+    ########################################
+    # Security
+    ########################################
+
+    # Display sleep on AC power: 10 minutes
+    run_sudo_cmd "pmset -c displaysleep 10"
+
+    # Require password immediately after screensaver/sleep
+    run_cmd "defaults write com.apple.screensaver askForPassword -int 1"
+    run_cmd "defaults write com.apple.screensaver askForPasswordDelay -int 0"
+
+    ########################################
+    # Misc
+    ########################################
+
+    # Auto-delete verification codes from Messages after use
+    run_cmd "defaults write com.apple.onetimepasscodes DeleteVerificationCodes -int 1"
+
+    ########################################
+    # Safari
+    ########################################
+
+    # Enable Develop menu in Safari
+    run_cmd "defaults write com.apple.Safari.plist IncludeDevelopMenu -int 1"
+    # Enable Web Inspector (right-click > Inspect Element)
+    run_cmd "defaults write com.apple.Safari.plist WebKitDeveloperExtrasEnabledPreferenceKey -int 1"
+    # Enable WebKit developer extras in web views
+    run_cmd "defaults write com.apple.Safari.plist \"com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled\" -int 1"
+
+    ########################################
+    # TextEdit
+    ########################################
+
+    # Use plain text mode for new TextEdit documents
+    run_cmd "defaults write com.apple.TextEdit RichText -int 0"
+    # Open and save files as UTF-8 in TextEdit
+    run_cmd "defaults write com.apple.TextEdit PlainTextEncoding -int 4"
+    run_cmd "defaults write com.apple.TextEdit PlainTextEncodingForWrite -int 4"
+
+    ########################################
+    # Apply changes
+    ########################################
+
+    run_cmd "killall Dock >/dev/null 2>&1 || true"
+    run_cmd "killall Finder >/dev/null 2>&1 || true"
+    run_cmd "killall SystemUIServer >/dev/null 2>&1 || true"
+
+    success "macOS defaults applied"
+    warn "Some changes may require a logout/restart to take full effect"
 }
 
 ########################################
