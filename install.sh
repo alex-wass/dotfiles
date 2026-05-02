@@ -491,6 +491,13 @@ step_macos() {
     run_cmd "defaults write com.apple.TextEdit PlainTextEncodingForWrite -int 4"
 
     ########################################
+    # Services
+    ########################################
+
+    run_cmd "mkdir -p \"$HOME/Library/Services\""
+    run_cmd "cp -R \"$DOTFILES_DIR/services/\"*.workflow \"$HOME/Library/Services/\""
+
+    ########################################
     # Apply changes
     ########################################
 
