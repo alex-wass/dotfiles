@@ -200,6 +200,7 @@ alias nah='git reset --hard;git clean -df'
 # Laravel
 alias sail='bash vendor/bin/sail'
 alias ss='sail up -d'
+alias sd='sail down'
 alias pint='php vendor/bin/pint'
 alias stan='php ./vendor/bin/phpstan analyse --memory-limit=2G'
 alias sa='sail artisan'
