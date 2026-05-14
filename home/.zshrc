@@ -203,6 +203,7 @@ alias ss='sail up -d'
 alias sd='sail down'
 alias pint='php vendor/bin/pint'
 alias stan='php ./vendor/bin/phpstan analyse --memory-limit=2G'
+alias pest='sail artisan test --compact --parallel'
 alias sa='sail artisan'
 alias mfs='sail artisan migrate:fresh --seed'
 
