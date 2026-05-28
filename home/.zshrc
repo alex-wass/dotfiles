@@ -243,7 +243,7 @@ fi
 # =============================================================================
 
 # Show latest available version for a Composer package
-csl() { composer2 show -l "$1" }
+csl() { composer show -l "$1" }
 
 # Switch between Homebrew PHP versions (e.g. switch-php 8.2)
 switch-php() { brew unlink php && brew link php@"$1" }
