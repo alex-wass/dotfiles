@@ -54,7 +54,6 @@ git clone git@github.com:alex-wass/dotfiles.git ~/.dotfiles
 - [ ] [Blackmagic Disk Speed Test](https://apps.apple.com/gb/app/blackmagic-disk-speed-test/id425264550)
 - [ ] [Bruno](https://www.usebruno.com/downloads)
 - [ ] [Burp Suite](https://portswigger.net/burp/releases/professional-community-2026-3-3?requestededition=community)
-- [ ] [CopyClip](https://apps.apple.com/gb/app/copyclip-clipboard-history/id595191960)
 - [ ] [Discord](https://discord.com/download)
 - [ ] [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [ ] [Ghostty](https://ghostty.org/download)
