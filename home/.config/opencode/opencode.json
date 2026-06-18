@@ -10,6 +10,10 @@
       "type": "remote",
       "url": "http://127.0.0.1:29979/mcp",
       "enabled": true
+    },
+    "tablepro": {
+      "type": "local",
+      "command": ["/Applications/TablePro.app/Contents/MacOS/tablepro-mcp"]
     }
   },
   "permission": {
