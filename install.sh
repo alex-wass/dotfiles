@@ -290,6 +290,8 @@ step_brew() {
 
     run_cmd "/opt/homebrew/bin/brew bundle check --file \"$DOTFILES_DIR/Brewfile\" >/dev/null 2>&1 || /opt/homebrew/bin/brew bundle install --file \"$DOTFILES_DIR/Brewfile\" >/dev/null 2>&1"
 
+    run_cmd "npm install -g opencode-with-claude"
+
     success "Homebrew and packages installed"
 }
 

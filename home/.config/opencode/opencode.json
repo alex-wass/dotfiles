@@ -16,11 +16,23 @@
       "command": ["/Applications/TablePro.app/Contents/MacOS/tablepro-mcp"]
     }
   },
+  "plugin": ["opencode-with-claude"],
+  "provider": {
+    "anthropic": {
+      "options": {
+        "baseURL": "http://127.0.0.1:3456",
+        "apiKey": "dummy"
+      }
+    }
+  },
   "permission": {
     "bash": {
       "rm *": "ask",
       "git push *": "deny",
       "git reset *": "deny"
+    },
+    "external_directory": {
+      "/tmp/**": "allow"
     }
   }
 }
