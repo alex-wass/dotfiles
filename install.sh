@@ -20,7 +20,7 @@ FORCE=0
 DOTFILES_DIR=""
 _DOTFILES_TMPDIR=""
 declare -a SELECTED_STEPS=()
-ALL_STEPS=(cli touchid ssh git brew shell macos composer)
+ALL_STEPS=(cli touchid ssh git brew shell composer macos ai)
 
 usage() {
     cat <<EOF
@@ -35,6 +35,7 @@ Steps available:
     shell     Copy shell config files
     composer  Install global composer packages
     macos     Apply macOS system defaults (Dock, Finder, Keyboard, etc.)
+    ai        Copy Claude skill files
     all       Run all steps (default)
 
 Flags:
@@ -509,6 +510,26 @@ step_macos() {
 
     success "macOS defaults applied"
     warn "Some changes may require a logout/restart to take full effect"
+}
+
+########################################
+# AI helpers
+########################################
+step_ai() {
+    step "Copying skill files"
+
+    local src="$DOTFILES_DIR/home/.claude/skills"
+    local dest="$HOME/.claude/skills"
+
+    if [[ -d "$dest" && $FORCE -eq 0 ]]; then
+        success "Skills already exist; skipping"
+        return 0
+    fi
+
+    run_cmd "mkdir -p \"$HOME/.claude\""
+    run_cmd "cp -R \"$src\" \"$dest\""
+
+    success "Skill files copied"
 }
 
 ########################################
