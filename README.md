@@ -18,7 +18,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/alex-wass/dotfiles/HEAD/inst
 | `shell`   | Copy shell config files                                      |
 | `composer`| Install global composer packages                             |
 | `macos`   | Apply macOS system defaults (Dock, Finder, Keyboard, etc.)   |
-| `ai`      | Copy skill files                                      |
+| `ai`      | Install agent skills                                         |
 
 ### Flags
 

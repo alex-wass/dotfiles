@@ -35,7 +35,7 @@ Steps available:
     shell     Copy shell config files
     composer  Install global composer packages
     macos     Apply macOS system defaults (Dock, Finder, Keyboard, etc.)
-    ai        Copy Claude skill files
+    ai        Clone Claude skills from github.com/alex-wass/skills
     all       Run all steps (default)
 
 Flags:
@@ -516,20 +516,45 @@ step_macos() {
 # AI helpers
 ########################################
 step_ai() {
-    step "Copying skill files"
+    step "Installing Claude skills"
 
-    local src="$DOTFILES_DIR/home/.claude/skills"
+    local url="https://github.com/alex-wass/skills/archive/refs/heads/master.tar.gz"
     local dest="$HOME/.claude/skills"
 
-    if [[ -d "$dest" && $FORCE -eq 0 ]]; then
-        success "Skills already exist; skipping"
+    run_cmd "mkdir -p \"$dest\""
+
+    if [[ $DRY_RUN -eq 1 ]]; then
+        echo "$ curl -fsSL $url | tar -xz -C <tmpdir> --strip-components=1"
+        echo "$ cp -R <tmpdir>/* \"$dest\"/"
         return 0
     fi
 
-    run_cmd "mkdir -p \"$HOME/.claude\""
-    run_cmd "cp -R \"$src\" \"$dest\""
+    local tmp
+    tmp=$(mktemp -d)
 
-    success "Skill files copied"
+    if ! curl -fsSL "$url" | tar -xz -C "$tmp" --strip-components=1; then
+        rm -rf "$tmp"
+        warn "Failed to download skills; leaving $dest untouched"
+        return 0
+    fi
+
+    local found=0
+    for skill in "$tmp"/*/; do
+        skill="${skill%/}"
+        [[ -f "$skill/SKILL.md" ]] || continue
+        rm -rf "$dest/$(basename "$skill")"
+        cp -R "$skill" "$dest/"
+        found=1
+    done
+
+    rm -rf "$tmp"
+
+    if [[ $found -eq 0 ]]; then
+        warn "No skills found in the downloaded archive"
+        return 0
+    fi
+
+    success "Skills downloaded into $dest"
 }
 
 ########################################
