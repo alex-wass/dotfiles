@@ -20,7 +20,7 @@ FORCE=0
 DOTFILES_DIR=""
 _DOTFILES_TMPDIR=""
 declare -a SELECTED_STEPS=()
-ALL_STEPS=(cli touchid ssh git brew shell composer macos ai)
+ALL_STEPS=(cli touchid ssh git brew shell composer macos ai mcp)
 
 usage() {
     cat <<EOF
@@ -36,6 +36,7 @@ Steps available:
     composer  Install global composer packages
     macos     Apply macOS system defaults (Dock, Finder, Keyboard, etc.)
     ai        Clone Claude skills from github.com/alex-wass/skills
+    mcp       Register global Claude MCP servers
     all       Run all steps (default)
 
 Flags:
@@ -555,6 +556,41 @@ step_ai() {
     fi
 
     success "Skills downloaded into $dest"
+}
+
+########################################
+# Claude MCP servers
+########################################
+add_mcp_server() {
+    local name=$1
+    local scope=$2
+    shift 2
+
+    if claude mcp get "$name" >/dev/null 2>&1; then
+        if [[ $FORCE -eq 0 ]]; then
+            success "$name already configured; skipping"
+            return 0
+        fi
+        run_cmd "claude mcp remove $name --scope $scope >/dev/null 2>&1 || true"
+    fi
+
+    run_cmd "claude mcp add $name --scope $scope $* >/dev/null 2>&1"
+
+    success "$name added"
+}
+
+step_mcp() {
+    step "Registering Claude MCP servers"
+
+    if ! command -v claude >/dev/null 2>&1 && [[ $DRY_RUN -eq 0 ]]; then
+        warn "claude CLI not found; skipping MCP servers"
+        return 0
+    fi
+
+    add_mcp_server chrome-devtools user npx chrome-devtools-mcp@latest
+    add_mcp_server tablepro user -- /Applications/TablePro.app/Contents/MacOS/tablepro-mcp
+
+    success "MCP servers registered"
 }
 
 ########################################

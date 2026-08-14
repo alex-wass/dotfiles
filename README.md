@@ -19,6 +19,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/alex-wass/dotfiles/HEAD/inst
 | `composer`| Install global composer packages                             |
 | `macos`   | Apply macOS system defaults (Dock, Finder, Keyboard, etc.)   |
 | `ai`      | Install agent skills                                         |
+| `mcp`     | Register Claude MCP servers                                  |
 
 ### Flags
 
