@@ -74,7 +74,6 @@ git clone git@github.com:alex-wass/dotfiles.git ~/.dotfiles
 - [ ] [Solo](https://soloterm.com/)
 - [ ] [Spotify](https://www.spotify.com/uk/download/mac/)
 - [ ] [Steam](https://store.steampowered.com/about/)
-- [ ] [TablePlus](https://tableplus.com/download/)
 - [ ] [Tailscale](https://tailscale.com/download)
 - [ ] [Tunnelblick](https://tunnelblick.net/downloads.html)
 - [ ] [uBlock Origin Lite](https://apps.apple.com/gb/app/ublock-origin-lite/id6745342698)
