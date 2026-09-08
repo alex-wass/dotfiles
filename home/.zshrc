@@ -226,6 +226,9 @@ alias vs='code "`pwd`"'
 # Copy SSH public key to clipboard
 alias copykey='command cat ~/.ssh/id_ed25519.pub 2>/dev/null || command cat ~/.ssh/id_rsa.pub 2>/dev/null | pbcopy'
 
+# Agents
+alias cc='claude'
+
 
 # =============================================================================
 # Tool Setup
