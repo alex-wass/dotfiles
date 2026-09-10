@@ -229,6 +229,9 @@ alias copykey='command cat ~/.ssh/id_ed25519.pub 2>/dev/null || command cat ~/.s
 # Agents
 alias cc='claude'
 
+# Cloudflare tunnel
+alias tunnel='cloudflared tunnel run local'
+
 
 # =============================================================================
 # Tool Setup
